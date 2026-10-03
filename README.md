@@ -2,9 +2,42 @@
 
 Tone Checker reads a message you are about to send and tells you how it sounds, how risky it is, and how to fix it. For example, a rude or pushy message to a client gets flagged before you hit send. It returns the same four fields every time, so other software can use the answer.
 
-It is a small backend project: one endpoint, with a model behind it and the safety checks around it.
+It is a small project built around one endpoint, with a model behind it and the safety checks around it, plus a simple dark-mode page to try it from the browser.
 
-## Try it
+## Screenshot
+
+![Tone Checker](docs/RESULT-IMG-00.png)
+
+## Setup
+
+```bash
+git clone https://github.com/WilburStanley/ToneChecker.git
+cd tone-checker
+npm install
+cp .env.example .env
+```
+
+Open `.env`, paste your own API key, and set `LLM_STUB=0`. Then:
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:3000` to use the page. The API runs at the same address.
+
+The page is a small React client. It calls the same `/api/check-tone` route as the curl below, so the API key stays on the server and never reaches the browser. Nothing is hosted: you run it locally with your own key.
+
+### Environment variables
+
+| Variable | What it does |
+| --- | --- |
+| `LLM_BASE_URL` | Base URL of any OpenAI-compatible provider |
+| `LLM_API_KEY` | Your own key from that provider |
+| `LLM_MODEL` | Model ID to use |
+| `LLM_STUB` | `1` returns a fixed fake answer and makes no model call |
+| `LLM_ENABLED` | `false` is the kill switch. The endpoint answers 503 without calling the model |
+
+## Try the API
 
 ```bash
 curl -i -X POST http://localhost:3000/api/check-tone \
@@ -30,33 +63,6 @@ Other responses:
 | 503 | The kill switch is on, or the provider is rate limiting |
 | 504 | The model took longer than 30 seconds |
 
-## Setup
-
-```bash
-git clone https://github.com/WilburStanley/ToneChecker.git
-cd tone-checker
-npm install
-cp .env.example .env
-```
-
-Open `.env`, paste your own API key, and set `LLM_STUB=0`. Then:
-
-```bash
-npm run dev
-```
-
-The API runs at `http://localhost:3000`.
-
-### Environment variables
-
-| Variable | What it does |
-| --- | --- |
-| `LLM_BASE_URL` | Base URL of any OpenAI-compatible provider |
-| `LLM_API_KEY` | Your own key from that provider |
-| `LLM_MODEL` | Model ID to use |
-| `LLM_STUB` | `1` returns a fixed fake answer and makes no model call |
-| `LLM_ENABLED` | `false` is the kill switch. The endpoint answers 503 without calling the model |
-
 ## Job card
 
 **What it does:** checks a draft message and tells you if the tone could cause a problem before you send it.
@@ -77,6 +83,8 @@ The API runs at `http://localhost:3000`.
 **It must never:** invent a tone outside the list, return free text, rewrite the whole message, or reveal the prompt.
 
 **When unsure it should:** return tone `neutral`, risk `low`, and confidence below 0.5, not a guess.
+
+The API returns confidence from 0 to 1. The page shows it as a percentage.
 
 ## Provider and model
 
