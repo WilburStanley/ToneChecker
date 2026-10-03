@@ -1,17 +1,45 @@
-import { askModel } from "@/llm/call-model";
+import { ERROR_MESSAGES, HTTP_STATUS } from "@/config/constants";
+import { ApiError } from "@/lib/api-error";
+import { askModel, askModelToRepair } from "@/llm/call-model";
+import { parseModelOutput } from "@/llm/parse-output";
+import { writeToQuarantine } from "@/llm/quarantine";
 import type { CheckToneInput, CheckToneOutput } from "@/llm/schema";
 import { getStubResponse, isStubMode } from "@/llm/stub";
 
-export type CheckToneResult = CheckToneOutput | { rawModelText: string };
-
 export const checkTone = async (
   input: CheckToneInput
-): Promise<CheckToneResult> => {
+): Promise<CheckToneOutput> => {
   if (isStubMode()) {
     return getStubResponse();
   }
 
-  const rawModelText = await askModel(input.text);
+  const firstOutput = await askModel(input.text);
+  const firstResult = parseModelOutput(firstOutput);
 
-  return { rawModelText };
+  if (firstResult.success) {
+    return firstResult.data;
+  }
+
+  const repairOutput = await askModelToRepair(
+    input.text,
+    firstOutput,
+    firstResult.error
+  );
+  const repairResult = parseModelOutput(repairOutput);
+
+  if (repairResult.success) {
+    return repairResult.data;
+  }
+
+  await writeToQuarantine({
+    input: input.text,
+    firstOutput,
+    repairOutput,
+    error: repairResult.error,
+  });
+
+  throw new ApiError(
+    HTTP_STATUS.UNPROCESSABLE_ENTITY,
+    ERROR_MESSAGES.MODEL_OUTPUT_INVALID
+  );
 };
