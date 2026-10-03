@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tone Checker
 
-## Getting Started
+Checks a draft message and tells you if the tone could cause a problem before you send it.
 
-First, run the development server:
+Status: work in progress. Right now only stub mode works. The model call comes in Stage 2.
+
+## Setup
+
+```bash
+git clone https://github.com/WilburStanley/ToneChecker.git
+cd tone-checker
+npm install
+cp .env.example .env
+```
+
+Open `.env`, fill in your own values, and set `LLM_STUB=1` for now.
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The API runs at `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Try it
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Valid request:
 
-## Learn More
+```bash
+curl -i -X POST http://localhost:3000/api/check-tone \
+  -H "Content-Type: application/json" \
+  -d '{"text":"hey, any update on the invoice?"}'
+```
 
-To learn more about Next.js, take a look at the following resources:
+Response (200):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```json
+{"tone":"neutral","risk":"low","fix":"Stub mode: no model was called.","confidence":0.9}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Broken request (empty text):
 
-## Deploy on Vercel
+```bash
+curl -i -X POST http://localhost:3000/api/check-tone \
+  -H "Content-Type: application/json" \
+  -d '{"text":""}'
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Response (400):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```json
+{"error":"text must not be empty","field":"text"}
+```
+
+## Providers
+
+The model, provider, and key are set in `.env` with three variables: `LLM_BASE_URL`, `LLM_API_KEY`, and `LLM_MODEL`. Those three are the only difference between a model on a laptop and one in a datacenter, so nothing is hard-coded to a provider.
