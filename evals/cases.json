@@ -1,0 +1,50 @@
+[
+  {
+    "id": "friendly-1",
+    "text": "Hi Maya, thanks for sending that over! Could you share the final version by Friday if it's not too much trouble?",
+    "expectedTone": "friendly",
+    "note": "Polite, warm, soft request."
+  },
+  {
+    "id": "neutral-1",
+    "text": "The meeting is moved to 3 PM. The agenda is attached.",
+    "expectedTone": "neutral",
+    "note": "Plain information, no emotion."
+  },
+  {
+    "id": "pushy-1",
+    "text": "Reply to my message right now. I'm not asking again.",
+    "expectedTone": "pushy",
+    "note": "Demanding and impatient, but not insulting."
+  },
+  {
+    "id": "rude-1",
+    "text": "This is the worst work I have ever seen. Redo it.",
+    "expectedTone": "rude",
+    "note": "Insulting, no constructive point."
+  },
+  {
+    "id": "casual-1",
+    "text": "yo bro wuts the status lol",
+    "expectedTone": "casual",
+    "note": "Slang and abbreviations."
+  },
+  {
+    "id": "formal-1",
+    "text": "Dear Sir or Madam, I hereby request written confirmation of the aforementioned arrangement at your earliest convenience.",
+    "expectedTone": "formal",
+    "note": "Stiff, official wording."
+  },
+  {
+    "id": "ambiguous-1",
+    "text": "Per my last email, the deadline was yesterday.",
+    "expectedTone": "pushy",
+    "note": "Ambiguous: could read as neutral or formal. I judge it passive-aggressive."
+  },
+  {
+    "id": "unsure-1",
+    "text": "ok",
+    "expectedTone": "neutral",
+    "note": "Too short to judge. Should return neutral with confidence below 0.5."
+  }
+]
