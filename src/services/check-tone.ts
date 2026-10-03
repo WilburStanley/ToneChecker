@@ -1,17 +1,17 @@
-import { ERROR_MESSAGES, HTTP_STATUS } from "@/config/constants";
-import { ApiError } from "@/lib/api-error";
+import { askModel } from "@/llm/call-model";
 import type { CheckToneInput, CheckToneOutput } from "@/llm/schema";
 import { getStubResponse, isStubMode } from "@/llm/stub";
 
+export type CheckToneResult = CheckToneOutput | { rawModelText: string };
+
 export const checkTone = async (
   input: CheckToneInput
-): Promise<CheckToneOutput> => {
+): Promise<CheckToneResult> => {
   if (isStubMode()) {
     return getStubResponse();
   }
 
-  throw new ApiError(
-    HTTP_STATUS.NOT_IMPLEMENTED,
-    ERROR_MESSAGES.MODEL_NOT_IMPLEMENTED
-  );
+  const rawModelText = await askModel(input.text);
+
+  return { rawModelText };
 };
