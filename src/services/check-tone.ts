@@ -1,4 +1,5 @@
 import { ERROR_MESSAGES, HTTP_STATUS } from "@/config/constants";
+import { isLlmEnabled } from "@/config/env";
 import { ApiError } from "@/lib/api-error";
 import { askModel, askModelToRepair } from "@/llm/call-model";
 import { parseModelOutput } from "@/llm/parse-output";
@@ -9,6 +10,13 @@ import { getStubResponse, isStubMode } from "@/llm/stub";
 export const checkTone = async (
   input: CheckToneInput
 ): Promise<CheckToneOutput> => {
+  if (!isLlmEnabled()) {
+    throw new ApiError(
+      HTTP_STATUS.SERVICE_UNAVAILABLE,
+      ERROR_MESSAGES.LLM_DISABLED
+    );
+  }
+
   if (isStubMode()) {
     return getStubResponse();
   }

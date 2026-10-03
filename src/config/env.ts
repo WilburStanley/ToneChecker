@@ -1,6 +1,8 @@
 import { ERROR_MESSAGES, HTTP_STATUS } from "@/config/constants";
 import { ApiError } from "@/lib/api-error";
 
+export const isLlmEnabled = () => process.env.LLM_ENABLED !== "false";
+
 export const getLlmConfig = () => {
   const baseUrl = process.env.LLM_BASE_URL;
   const apiKey = process.env.LLM_API_KEY;
